@@ -476,22 +476,22 @@ bool OutputStateMachineEngine::ActionCsiDispatch(const VTID id, const VTParamete
         break;
     case CsiActionCodes::ED_EraseDisplay:
         success = parameters.for_each([&](const auto eraseType) {
-            return _dispatch->EraseInDisplay(eraseType.value_or_enum(DispatchTypes::EraseType::ToEnd));
+            return _dispatch->EraseInDisplay(eraseType);
         });
         break;
     case CsiActionCodes::DECSED_SelectiveEraseDisplay:
         success = parameters.for_each([&](const auto eraseType) {
-            return _dispatch->SelectiveEraseInDisplay(eraseType.value_or_enum(DispatchTypes::EraseType::ToEnd));
+            return _dispatch->SelectiveEraseInDisplay(eraseType);
         });
         break;
     case CsiActionCodes::EL_EraseLine:
         success = parameters.for_each([&](const auto eraseType) {
-            return _dispatch->EraseInLine(eraseType.value_or_enum(DispatchTypes::EraseType::ToEnd));
+            return _dispatch->EraseInLine(eraseType);
         });
         break;
     case CsiActionCodes::DECSEL_SelectiveEraseLine:
         success = parameters.for_each([&](const auto eraseType) {
-            return _dispatch->SelectiveEraseInLine(eraseType.value_or_enum(DispatchTypes::EraseType::ToEnd));
+            return _dispatch->SelectiveEraseInLine(eraseType);
         });
         break;
     case CsiActionCodes::SM_SetMode:
@@ -533,7 +533,7 @@ bool OutputStateMachineEngine::ActionCsiDispatch(const VTID id, const VTParamete
         success = parameters.at(0).value_or(0) == 0 && _dispatch->TertiaryDeviceAttributes();
         break;
     case CsiActionCodes::DECREQTPARM_RequestTerminalParameters:
-        success = _dispatch->RequestTerminalParameters(parameters.at(0).value_or_enum(DispatchTypes::ReportingPermission::Unsolicited));
+        success = _dispatch->RequestTerminalParameters(parameters.at(0));
         break;
     case CsiActionCodes::SU_ScrollUp:
         success = _dispatch->ScrollUp(parameters.at(0));
@@ -558,14 +558,14 @@ bool OutputStateMachineEngine::ActionCsiDispatch(const VTID id, const VTParamete
         break;
     case CsiActionCodes::TBC_TabClear:
         success = parameters.for_each([&](const auto clearType) {
-            return _dispatch->TabClear(clearType.value_or_enum(DispatchTypes::TabClearType::ClearCurrentColumn));
+            return _dispatch->TabClear(clearType);
         });
         break;
     case CsiActionCodes::ECH_EraseCharacters:
         success = _dispatch->EraseCharacters(parameters.at(0));
         break;
     case CsiActionCodes::DTTERM_WindowManipulation:
-        success = _dispatch->WindowManipulation(parameters.at(0).value_or_enum(DispatchTypes::WindowManipulationType::Invalid), parameters.at(1), parameters.at(2));
+        success = _dispatch->WindowManipulation(parameters.at(0), parameters.at(1), parameters.at(2));
         break;
     case CsiActionCodes::REP_RepeatCharacter:
         // Handled w/o the dispatch. This function is unique in that way
@@ -582,7 +582,7 @@ bool OutputStateMachineEngine::ActionCsiDispatch(const VTID id, const VTParamete
         success = true;
         break;
     case CsiActionCodes::DECSCUSR_SetCursorStyle:
-        success = _dispatch->SetCursorStyle(parameters.at(0).value_or_enum(DispatchTypes::CursorStyle::UserDefault));
+        success = _dispatch->SetCursorStyle(parameters.at(0));
         break;
     case CsiActionCodes::DECSTR_SoftReset:
         success = _dispatch->SoftReset();
@@ -614,7 +614,7 @@ bool OutputStateMachineEngine::ActionCsiDispatch(const VTID id, const VTParamete
         success = _dispatch->CopyRectangularArea(parameters.at(0), parameters.at(1), parameters.at(2).value_or(0), parameters.at(3).value_or(0), parameters.at(4), parameters.at(5), parameters.at(6), parameters.at(7));
         break;
     case CsiActionCodes::DECRQPSR_RequestPresentationStateReport:
-        success = _dispatch->RequestPresentationStateReport(parameters.at(0).value_or_enum(DispatchTypes::PresentationReportFormat::Invalid));
+        success = _dispatch->RequestPresentationStateReport(parameters.at(0));
         break;
     case CsiActionCodes::DECFRA_FillRectangularArea:
         success = _dispatch->FillRectangularArea(parameters.at(0), parameters.at(1), parameters.at(2), parameters.at(3).value_or(0), parameters.at(4).value_or(0));
@@ -632,7 +632,7 @@ bool OutputStateMachineEngine::ActionCsiDispatch(const VTID id, const VTParamete
         success = _dispatch->DeleteColumn(parameters.at(0));
         break;
     case CsiActionCodes::DECSACE_SelectAttributeChangeExtent:
-        success = _dispatch->SelectAttributeChangeExtent(parameters.at(0).value_or_enum(DispatchTypes::ChangeExtent::Default));
+        success = _dispatch->SelectAttributeChangeExtent(parameters.at(0));
         break;
     case CsiActionCodes::DECRQCRA_RequestChecksumRectangularArea:
         success = _dispatch->RequestChecksumRectangularArea(parameters.at(0).value_or(0), parameters.at(1).value_or(0), parameters.at(2), parameters.at(3), parameters.at(4).value_or(0), parameters.at(5).value_or(0));
@@ -641,7 +641,7 @@ bool OutputStateMachineEngine::ActionCsiDispatch(const VTID id, const VTParamete
         success = _dispatch->InvokeMacro(parameters.at(0).value_or(0));
         break;
     case CsiActionCodes::DECAC_AssignColor:
-        success = _dispatch->AssignColor(parameters.at(0).value_or_enum(DispatchTypes::ColorItem::Invalid), parameters.at(1).value_or(0), parameters.at(2).value_or(0));
+        success = _dispatch->AssignColor(parameters.at(0), parameters.at(1).value_or(0), parameters.at(2).value_or(0));
         break;
     case CsiActionCodes::DECPS_PlaySound:
         success = _dispatch->PlaySounds(parameters);
@@ -682,27 +682,24 @@ IStateMachineEngine::StringHandler OutputStateMachineEngine::ActionDcsDispatch(c
     case DcsActionCodes::DECDLD_DownloadDRCS:
         handler = _dispatch->DownloadDRCS(parameters.at(0),
                                           parameters.at(1),
-                                          parameters.at(2).value_or_enum(DispatchTypes::DrcsEraseControl::AllChars),
-                                          parameters.at(3).value_or_enum(DispatchTypes::DrcsCellMatrix::Default),
-                                          parameters.at(4).value_or_enum(DispatchTypes::DrcsFontSet::Default),
-                                          parameters.at(5).value_or_enum(DispatchTypes::DrcsFontUsage::Default),
+                                          parameters.at(2),
+                                          parameters.at(3),
+                                          parameters.at(4),
+                                          parameters.at(5),
                                           parameters.at(6),
-                                          parameters.at(7).value_or_enum(DispatchTypes::DrcsCharsetSize::Size94));
+                                          parameters.at(7));
         break;
     case DcsActionCodes::DECDMAC_DefineMacro:
-        handler = _dispatch->DefineMacro(
-            parameters.at(0).value_or(0),
-            parameters.at(1).value_or_enum(DispatchTypes::MacroDeleteControl::DeleteId),
-            parameters.at(2).value_or_enum(DispatchTypes::MacroEncoding::Text));
+        handler = _dispatch->DefineMacro(parameters.at(0).value_or(0), parameters.at(1), parameters.at(2));
         break;
     case DcsActionCodes::DECRSTS_RestoreTerminalState:
-        handler = _dispatch->RestoreTerminalState(parameters.at(0).value_or_enum(DispatchTypes::ReportFormat::Invalid));
+        handler = _dispatch->RestoreTerminalState(parameters.at(0));
         break;
     case DcsActionCodes::DECRQSS_RequestSetting:
         handler = _dispatch->RequestSetting();
         break;
     case DcsActionCodes::DECRSPS_RestorePresentationState:
-        handler = _dispatch->RestorePresentationState(parameters.at(0).value_or_enum(DispatchTypes::PresentationReportFormat::Invalid));
+        handler = _dispatch->RestorePresentationState(parameters.at(0));
         break;
     default:
         handler = nullptr;

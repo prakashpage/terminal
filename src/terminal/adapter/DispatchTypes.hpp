@@ -134,11 +134,11 @@ namespace Microsoft::Console::VirtualTerminal
             return _value < 0 ? defaultValue : _value;
         }
 
-        template<typename T>
-        constexpr T value_or_enum(T defaultValue) const noexcept
-            requires std::is_enum_v<T>
+        template<typename T, typename = std::enable_if_t<std::is_enum_v<T>>>
+        constexpr operator T() const noexcept
         {
-            return static_cast<T>(value_or(static_cast<VTInt>(defaultValue)));
+            // For most selective parameters, omitted values will default to 0.
+            return static_cast<T>(value_or(0));
         }
 
         constexpr operator VTInt() const noexcept
@@ -356,14 +356,12 @@ namespace Microsoft::Console::VirtualTerminal::DispatchTypes
 {
     enum class ColorItem : VTInt
     {
-        Invalid = 0,
         NormalText = 1,
         WindowFrame = 2,
     };
 
     enum class ColorModel : VTInt
     {
-        Invalid = 0,
         HLS = 1,
         RGB = 2,
     };
@@ -648,14 +646,12 @@ namespace Microsoft::Console::VirtualTerminal::DispatchTypes
 
     enum class ReportFormat : VTInt
     {
-        Invalid = 0,
         TerminalStateReport = 1,
         ColorTableReport = 2
     };
 
     enum class PresentationReportFormat : VTInt
     {
-        Invalid = 0,
         CursorInformationReport = 1,
         TabulationStopReport = 2
     };

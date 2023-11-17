@@ -45,7 +45,7 @@ size_t AdaptDispatch::_SetRgbColorsHelper(const VTParameters options,
                                           const bool isForeground) noexcept
 {
     size_t optionsConsumed = 1;
-    const auto typeOpt = options.at(0).value_or_enum(DispatchTypes::GraphicsOptions::Off);
+    const DispatchTypes::GraphicsOptions typeOpt = options.at(0);
     if (typeOpt == DispatchTypes::GraphicsOptions::RGBColorOrFaint)
     {
         optionsConsumed = 4;
@@ -117,7 +117,7 @@ void AdaptDispatch::_SetRgbColorsHelperFromSubParams(const VTParameter colorItem
         };
     };
 
-    const auto typeOpt = options.at(0).value_or_enum(DispatchTypes::GraphicsOptions::Off);
+    const DispatchTypes::GraphicsOptions typeOpt = options.at(0);
     switch (typeOpt)
     {
     case DispatchTypes::GraphicsOptions::RGBColorOrFaint:
@@ -176,7 +176,7 @@ size_t AdaptDispatch::_ApplyGraphicsOption(const VTParameters options,
                                            const size_t optionIndex,
                                            TextAttribute& attr) noexcept
 {
-    const auto opt = options.at(optionIndex).value_or_enum(GraphicsOptions::Off);
+    const GraphicsOptions opt = options.at(optionIndex);
 
     if (options.hasSubParamsFor(optionIndex))
     {
@@ -442,7 +442,7 @@ bool AdaptDispatch::SetCharacterProtectionAttribute(const VTParameters options)
     auto attr = textBuffer.GetCurrentAttributes();
     for (size_t i = 0; i < options.size(); i++)
     {
-        const auto opt = options.at(i).value_or_enum(LogicalAttributeOptions::Default);
+        const LogicalAttributeOptions opt = options.at(i);
         switch (opt)
         {
         case Default:

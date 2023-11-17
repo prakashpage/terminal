@@ -109,7 +109,6 @@ namespace Microsoft::Console::VirtualTerminal
         F10 = 21,
         F11 = 23,
         F12 = 24,
-        InvalidMax = -1,
     };
 
     enum class Ss3ActionCodes : wchar_t
