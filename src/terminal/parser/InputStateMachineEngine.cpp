@@ -425,7 +425,7 @@ bool InputStateMachineEngine::ActionCsiDispatch(const VTID id, const VTParameter
         success = success && _WriteSingleKey(vkey, modifierState);
         break;
     case CsiActionCodes::Generic:
-        success = _GetGenericVkey(parameters.at(0), vkey);
+        success = _GetGenericVkey(parameters.at(0).value_or_enum(GenericKeyIdentifiers::InvalidMax), vkey);
         modifierState = _GetGenericKeysModifierState(parameters);
         success = success && _WriteSingleKey(vkey, modifierState);
         break;
@@ -433,7 +433,7 @@ bool InputStateMachineEngine::ActionCsiDispatch(const VTID id, const VTParameter
         success = _WriteSingleKey(VK_TAB, SHIFT_PRESSED);
         break;
     case CsiActionCodes::DTTERM_WindowManipulation:
-        success = _pDispatch->WindowManipulation(parameters.at(0), parameters.at(1), parameters.at(2));
+        success = _pDispatch->WindowManipulation(parameters.at(0).value_or_enum(DispatchTypes::WindowManipulationType::Invalid), parameters.at(1), parameters.at(2));
         break;
     case CsiActionCodes::FocusIn:
         success = _pDispatch->FocusChanged(true);
@@ -750,8 +750,8 @@ DWORD InputStateMachineEngine::_GetGenericKeysModifierState(const VTParameters p
     //   Enhanced keys for the IBM 101- and 102-key keyboards are the INS, DEL,
     //   HOME, END, PAGE UP, PAGE DOWN, and direction keys in the clusters to the left
     //   of the keypad; and the divide (/) and ENTER keys in the keypad.
-    // This snippet detects the non-direction keys
-    const GenericKeyIdentifiers identifier = parameters.at(0);
+    // This snippet detects the non-direction keys (= 6 keys below/equal to Next).
+    const auto identifier = parameters.at(0).value_or_enum(GenericKeyIdentifiers::InvalidMax);
     if (identifier <= GenericKeyIdentifiers::Next)
     {
         modifiers = WI_SetFlag(modifiers, ENHANCED_KEY);
