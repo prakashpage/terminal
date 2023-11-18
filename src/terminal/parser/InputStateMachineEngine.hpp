@@ -28,9 +28,9 @@ namespace Microsoft::Console::VirtualTerminal
     constexpr short KEYSCAN_ALT = 4;
 
     // The values with which VT encodes modifier values.
-    constexpr short VT_SHIFT = 1;
-    constexpr short VT_ALT = 2;
-    constexpr short VT_CTRL = 4;
+    constexpr VTInt VT_SHIFT = 1;
+    constexpr VTInt VT_ALT = 2;
+    constexpr VTInt VT_CTRL = 4;
 
     // The assumed values for SGR Mouse Scroll Wheel deltas
     constexpr DWORD SCROLL_DELTA_BACKWARD = 0xFF800000;
@@ -178,7 +178,7 @@ namespace Microsoft::Console::VirtualTerminal
         DWORD _GetSGRMouseModifierState(const size_t modifierParam) noexcept;
         bool _GenerateKeyFromChar(const wchar_t wch, short& vkey, DWORD& modifierState) noexcept;
 
-        DWORD _GetModifier(const size_t parameter) noexcept;
+        static DWORD _GetModifier(VTInt parameter) noexcept;
 
         bool _UpdateSGRMouseButtonState(const VTID id,
                                         const size_t sgrEncoding,
