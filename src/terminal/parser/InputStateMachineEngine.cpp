@@ -325,7 +325,7 @@ bool InputStateMachineEngine::ActionEscDispatch(const VTID id)
         if (success)
         {
             // Alt is definitely pressed in the esc+key case.
-            modifierState = WI_SetFlag(modifierState, LEFT_ALT_PRESSED);
+            WI_SetFlag(modifierState, LEFT_ALT_PRESSED);
 
             success = _WriteSingleKey(wch, vk, modifierState);
         }
